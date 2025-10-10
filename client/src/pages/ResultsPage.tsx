@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { FormLayout } from "@/components/FormLayout";
 import { Stepper } from "@/components/Stepper";
+import { generatePDF } from "@/lib/pdfGenerator";
 
 interface SimulationResult {
   companySize: string;
@@ -15,20 +16,40 @@ interface SimulationResult {
   totalInterest: number;
 }
 
+interface SimulationData {
+  name: string;
+  companyName: string;
+  cnpj: string;
+  email: string;
+  phone: string;
+  municipality: string;
+  activitySector: string;
+  creditType: string;
+  annualRevenue: number;
+  projectValue: number;
+  financedValue: number;
+  termMonths: number;
+  graceMonths: number;
+}
+
 export function ResultsPage() {
   const [, navigate] = useLocation();
   const [result, setResult] = useState<SimulationResult | null>(null);
+  const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
 
   useEffect(() => {
     const savedResult = localStorage.getItem("simulationResult");
-    if (savedResult) {
+    const savedData = localStorage.getItem("simulationData");
+    
+    if (savedResult && savedData) {
       setResult(JSON.parse(savedResult));
+      setSimulationData(JSON.parse(savedData));
     } else {
       navigate("/");
     }
   }, [navigate]);
 
-  if (!result) {
+  if (!result || !simulationData) {
     return null;
   }
 
@@ -37,6 +58,12 @@ export function ResultsPage() {
       style: "currency",
       currency: "BRL",
     }).format(value);
+  };
+
+  const handleDownloadPDF = () => {
+    if (result && simulationData) {
+      generatePDF(result, simulationData);
+    }
   };
 
   return (
@@ -93,7 +120,11 @@ export function ResultsPage() {
             </div>
 
             <div className="flex justify-center">
-              <Button className="bg-green-500 hover:bg-green-600 text-white px-8">
+              <Button 
+                onClick={handleDownloadPDF}
+                className="bg-green-500 hover:bg-green-600 text-white px-8"
+                data-testid="button-download-pdf"
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Baixar simulação completa
               </Button>
