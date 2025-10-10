@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { ChevronRight } from "lucide-react";
 import { FormLayout } from "@/components/FormLayout";
+import { Stepper } from "@/components/Stepper";
 
 const projectDetailsSchema = z.object({
   activitySector: z.string().min(1, "Setor de atividade é obrigatório"),
@@ -120,33 +121,12 @@ export function ProjectDetailsForm() {
 
   return (
     <FormLayout>
-      <div className="max-w-4xl mx-auto w-full p-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
-                ✓
-              </div>
-              <span className="text-green-600 font-semibold">Dados básicos</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-green-500"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
-                2
-              </div>
-              <span className="text-green-600 font-semibold">Seu projeto</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full border-2 border-gray-300 text-gray-400 flex items-center justify-center font-semibold">
-                3
-              </div>
-              <span className="text-gray-400">Resultado</span>
-            </div>
-          </div>
-
-          <h1 className="text-4xl font-bold mb-8">Simulador de FNO</h1>
-        </div>
+      <div className="max-w-6xl mx-auto w-full p-8">
+        <div className="lg:flex lg:gap-12">
+          <Stepper currentStep={2} />
+          
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-8">Simulador de FNO</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
@@ -353,6 +333,8 @@ export function ProjectDetailsForm() {
             </Button>
           </div>
         </form>
+          </div>
+        </div>
       </div>
     </FormLayout>
   );
