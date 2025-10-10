@@ -5,14 +5,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
-import { Frame } from "@/pages/Frame";
+import { BasicDataForm } from "@/pages/BasicDataForm";
+import { ProjectDetailsForm } from "@/pages/ProjectDetailsForm";
+import { ResultsPage } from "@/pages/ResultsPage";
 
 function Router() {
   return (
     <Switch>
-      {/* Add pages below */}
-      <Route path="/" component={Frame} />
-      {/* Fallback to 404 */}
+      <Route path="/" component={BasicDataForm} />
+      <Route path="/projeto" component={ProjectDetailsForm} />
+      <Route path="/resultado" component={ResultsPage} />
       <Route component={NotFound} />
     </Switch>
   );
