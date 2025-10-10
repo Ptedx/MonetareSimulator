@@ -88,3 +88,26 @@ Preferred communication style: Simple, everyday language.
 **Session Management**
 - connect-pg-simple package included for PostgreSQL session storage (not currently active)
 - Prepared for future authentication implementation
+
+## Recent Changes
+
+### PDF Generation Feature (October 10, 2025)
+- **Added PDF export functionality**: Users can now download a complete simulation report with payment schedule
+- **Libraries installed**: jspdf (^3.0.3) and jspdf-autotable (^5.0.2) 
+- **PDF features**:
+  - Professional header with platform branding (green #10b981)
+  - Client information section (name, company, CNPJ, contact details)
+  - Financing information (company size, activity sector, interest rates)
+  - Financial summary (project value, financed amount, total paid, total interest)
+  - Complete payment schedule table with amortization details (Price system)
+  - Automatic pagination and page numbering
+  - Platform color scheme applied throughout
+- **Data flow updated**: ProjectDetailsForm now saves complete simulation data to localStorage
+- **Payment calculation**: Implemented Price system (fixed installments) with grace period support
+- **Implementation location**: `client/src/lib/pdfGenerator.ts` with integration in ResultsPage
+
+### Technical Infrastructure Updates
+- **Workflow configuration**: Created `start-server.sh` script to properly configure Node.js PATH for tsx execution
+- Fixed compatibility issues between Bun and Vite 7 by ensuring proper Node.js environment
+- Express 4.21.2 confirmed working correctly
+- Server running on port 5000 with Vite HMR connected
