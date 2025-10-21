@@ -17,11 +17,6 @@ import { ChevronRight } from "lucide-react";
 import { FormLayout } from "@/components/FormLayout";
 import { Stepper } from "@/components/Stepper";
 
-const validations = [
-  {validacao: "SERVIÇO", prazo: 144 },
-  {validacao: "Comércio", prazo: 144 },
-]
-
 const projectDetailsSchema = z.object({
   activitySector: z.string().min(1, "Setor de atividade é obrigatório"),
   creditType: z.string().min(1, "Modalidade do crédito é obrigatória"),
@@ -31,7 +26,7 @@ const projectDetailsSchema = z.object({
   projectValue: z.string().min(1, "Valor do projeto é obrigatório"),
   financedValue: z.string().min(1, "Valor financiado é obrigatório"),
   termMonths: z.string().min(1, "Prazo em meses é obrigatório"),
-  graceMonths: z.string().min(1, "Carência em meses é obrigatória"),
+  graceMonths: z.string(),
 }).superRefine((data,ctx)=>{
   const isInfra = data.activitySector?.toUpperCase() === "INFRA-ESTRUTURA"
   const term = parseInt(data.termMonths, 10)
@@ -81,8 +76,8 @@ const creditTypes = [
 ];
 
 const IndiceTypes = [
-  "Pré-fixado",
-  "Pós-fixado",
+  {value:"PRÉ", label: "Pré-fixado"},
+  {value:"PÓS", label: "Pós-fixado"},
 ]
 
 const AmortizationTypes = [
@@ -105,6 +100,7 @@ import { municipalities } from "../../../shared/municipalities";
 export function ProjectDetailsForm() {
   const [, navigate] = useLocation();
   const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState({city: '', rate:null})
   const [financedValue, setFinancedValue] = useState("");
   const [projectValue, setProjectValue] = useState("");
 
@@ -209,17 +205,23 @@ export function ProjectDetailsForm() {
   const limitFinance = (revenue:string, financed:string):string=>{
     const formatedRevenue = brlToNumber(revenue)
     const formatedFinanced = brlToNumber(financed);
+    const city = municipalities[selectedState].filter(item=> item.city === watch('municipality'))?.[0]
+    const isPriority = city.rate === 0.9
+    console.log('isPriority: ', isPriority)
 
-    if(formatedRevenue <= 4_800_000){
+    if(!isPriority && formatedRevenue <= 4_800_000){
       return formatCurrency((formatedFinanced).toString())
     }
-    if(formatedRevenue > 4_800_000 && formatedRevenue <= 90_000_000){
+    if(!isPriority && formatedRevenue > 4_800_000 && formatedRevenue <= 90_000_000){
       return formatCurrency((formatedFinanced * 0.8).toFixed(2).toString())
     }
-    if(formatedRevenue > 90_000_000 && formatedRevenue <= 300_000_000){
+    if(!isPriority && formatedRevenue > 90_000_000 && formatedRevenue <= 300_000_000){
       return formatCurrency((formatedFinanced * 0.6).toFixed(2).toString())
-    }else{
+    }if(!isPriority && formatedRevenue > 300_000_000){
       return formatCurrency((formatedFinanced * 0.6).toFixed(2).toString())
+    }
+    else{
+      return formatCurrency((formatedFinanced).toString())
     }
 
   }
@@ -339,9 +341,9 @@ export function ProjectDetailsForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {selectedState &&
-                    municipalities[selectedState]?.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
+                    municipalities[selectedState]?.map((item) => (
+                      <SelectItem key={item.city} value={item.city}>
+                        {item.city}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -452,8 +454,8 @@ export function ProjectDetailsForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {IndiceTypes.map((item, pos) => (
-                    <SelectItem key={pos} value={item}>
-                      {item}
+                    <SelectItem key={pos} value={item.value}>
+                      {item.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -492,7 +494,9 @@ export function ProjectDetailsForm() {
               )}
             </div>
           </div>
-
+          <div>
+            
+          </div>
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
