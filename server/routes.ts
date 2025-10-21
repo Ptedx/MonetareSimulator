@@ -36,10 +36,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let companySize = "Pequeno Porte";
-      if (annualRevenue > 300000000) {
-        companySize = "Grande Porte";
-      } else if (annualRevenue > 90000000) {
+      if (annualRevenue > 4800000) {
         companySize = "Médio Porte";
+      } else if (annualRevenue > 300000001) {
+        companySize = "Grande Porte";
       }
 
       const priorityMunicipalities = ["Amaturá", "Manaus"];

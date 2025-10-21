@@ -1,0 +1,451 @@
+UF;Municipio;annualRatePct
+AC;Cruzeiro do Sul;0.9
+AC;Mâncio Lima;1.1
+AC;Marechal Thaumaturgo;0.9
+AC;Porto Walter;0.9
+AC;Rodrigues Alves;0.9
+AC;Feijó;0.9
+AC;Jordão;0.9
+AC;Tarauacá;0.9
+AC;Manoel Urbano;0.9
+AC;Santa Rosa do Purus;0.9
+AC;Sena Madureira;0.9
+AC;Acrelândia;0.9
+AC;Bujari;0.9
+AC;Capixaba;0.9
+AC;Plácido de Castro;0.9
+AC;Rio Branco;1.1
+AC;Senador Guiomard;1.1
+AC;Porto Acre;0.9
+AC;Assis Brasil;0.9
+AC;Brasiléia;0.9
+AC;Epitaciolândia;0.9
+AC;Xapuri;0.9
+AM;Barcelos;0.9
+AM;Novo Airão;0.9
+AM;Santa Isabel do Rio Negro;0.9
+AM;São Gabriel da Cachoeira;0.9
+AM;Japurá;0.9
+AM;Maraã;0.9
+AM;Amaturá;0.9
+AM;Atalaia do Norte;0.9
+AM;Benjamin Constant;0.9
+AM;Fonte Boa;0.9
+AM;Jutaí;0.9
+AM;Santo Antônio do Içá;0.9
+AM;São Paulo de Olivença;0.9
+AM;Tabatinga;0.9
+AM;Tonantins;0.9
+AM;Carauari;0.9
+AM;Eirunepé;0.9
+AM;Envira;0.9
+AM;Guajará;0.9
+AM;Ipixuna;0.9
+AM;Itamarati;0.9
+AM;Juruá;0.9
+AM;Alvarães;0.9
+AM;Tefé;1.1
+AM;Uarini;0.9
+AM;Anamã;0.9
+AM;Anori;0.9
+AM;Beruri;0.9
+AM;Caapiranga;0.9
+AM;Coari;1.1
+AM;Codajás;0.9
+AM;Autazes;0.9
+AM;Careiro;0.9
+AM;Careiro da Várzea;0.9
+AM;Iranduba;1.1
+AM;Manacapuru;0.9
+AM;Manaquiri;0.9
+AM;Manaus;1.1
+AM;Presidente Figueiredo;1.1
+AM;Rio Preto da Eva;0.9
+AM;Itacoatiara;1.1
+AM;Itapiranga;1.1
+AM;Nova Olinda do Norte;0.9
+AM;Silves;0.9
+AM;Urucurituba;0.9
+AM;Barreirinha;0.9
+AM;Boa Vista do Ramos;0.9
+AM;Maués;0.9
+AM;Nhamundá;0.9
+AM;Parintins;1.1
+AM;São Sebastião do Uatumã;0.9
+AM;Urucará;0.9
+AM;Boca do Acre;0.9
+AM;Pauini;0.9
+AM;Canutama;0.9
+AM;Lábrea;0.9
+AM;Tapauá;0.9
+AM;Apuí;0.9
+AM;Borba;0.9
+AM;Humaitá;0.9
+AM;Manicoré;1.1
+AM;Novo Aripuanã;0.9
+AP;Calçoene;1.1
+AP;Oiapoque;0.9
+AP;Amapá;1.1
+AP;Pracuúba;0.9
+AP;Tartarugalzinho;0.9
+AP;Serra do Navio;0.9
+AP;Pedra Branca do Amapari;0.9
+AP;Cutias;0.9
+AP;Ferreira Gomes;1.1
+AP;Itaubal;0.9
+AP;Macapá;1.1
+AP;Porto Grande;1.1
+AP;Santana;0.9
+AP;Laranjal do Jari;0.9
+AP;Mazagão;0.9
+AP;Vitória do Jari;0.9
+PA;Faro;0.9
+PA;Juruti;0.9
+PA;Óbidos;0.9
+PA;Oriximiná;0.9
+PA;Terra Santa;1.1
+PA;Alenquer;0.9
+PA;Belterra;0.9
+PA;Curuá;0.9
+PA;Mojuí dos Campos;0.9
+PA;Monte Alegre;0.9
+PA;Placas;0.9
+PA;Prainha;0.9
+PA;Santarém;0.9
+PA;Almeirim;0.9
+PA;Porto de Moz;0.9
+PA;Bagre;0.9
+PA;Gurupá;0.9
+PA;Melgaço;0.9
+PA;Portel;0.9
+PA;Afuá;0.9
+PA;Anajás;0.9
+PA;Breves;0.9
+PA;Curralinho;0.9
+PA;São Sebastião da Boa Vista;0.9
+PA;Cachoeira do Arari;0.9
+PA;Chaves;0.9
+PA;Muaná;0.9
+PA;Ponta de Pedras;0.9
+PA;Salvaterra;0.9
+PA;Santa Cruz do Arari;0.9
+PA;Soure;0.9
+PA;Ananindeua;0.9
+PA;Barcarena;0.9
+PA;Belém;1.1
+PA;Benevides;1.1
+PA;Marituba;0.9
+PA;Santa Bárbara do Pará;0.9
+PA;Bujaru;0.9
+PA;Castanhal;1.1
+PA;Inhangapi;0.9
+PA;Santa Isabel do Pará;0.9
+PA;Santo Antônio do Tauá;0.9
+PA;Colares;0.9
+PA;Curuçá;0.9
+PA;Magalhães Barata;0.9
+PA;Maracanã;0.9
+PA;Marapanim;0.9
+PA;Salinópolis;1.1
+PA;São Caetano de Odivelas;0.9
+PA;São João da Ponta;0.9
+PA;São João de Pirabas;0.9
+PA;Terra Alta;0.9
+PA;Vigia;0.9
+PA;Augusto Corrêa;0.9
+PA;Bonito;0.9
+PA;Bragança;1.1
+PA;Capanema;0.9
+PA;Igarapé-Açu;1.1
+PA;Nova Timboteua;0.9
+PA;Peixe-Boi;0.9
+PA;Primavera;0.9
+PA;Quatipuru;0.9
+PA;Santa Maria do Pará;1.1
+PA;Santarém Novo;0.9
+PA;São Francisco do Pará;0.9
+PA;Tracuateua;0.9
+PA;Abaetetuba;0.9
+PA;Baião;0.9
+PA;Cametá;0.9
+PA;Igarapé-Miri;0.9
+PA;Limoeiro do Ajuru;0.9
+PA;Mocajuba;0.9
+PA;Oeiras do Pará;0.9
+PA;Acará;0.9
+PA;Concórdia do Pará;0.9
+PA;Moju;1.1
+PA;Tailândia;0.9
+PA;Tomé-Açu;0.9
+PA;Aurora do Pará;0.9
+PA;Cachoeira do Piriá;0.9
+PA;Capitão Poço;0.9
+PA;Garrafão do Norte;0.9
+PA;Ipixuna do Pará;0.9
+PA;Irituia;0.9
+PA;Mãe do Rio;1.1
+PA;Nova Esperança do Piriá;0.9
+PA;Ourém;0.9
+PA;Santa Luzia do Pará;0.9
+PA;São Domingos do Capim;0.9
+PA;São Miguel do Guamá;0.9
+PA;Viseu;0.9
+PA;Aveiro;0.9
+PA;Itaituba;1.1
+PA;Jacareacanga;1.1
+PA;Novo Progresso;1.1
+PA;Rurópolis;0.9
+PA;Trairão;1.1
+PA;Altamira;1.1
+PA;Anapu;0.9
+PA;Brasil Novo;1.1
+PA;Medicilândia;0.9
+PA;Pacajá;0.9
+PA;Senador José Porfírio;0.9
+PA;Uruará;0.9
+PA;Vitória do Xingu;1.1
+PA;Breu Branco;0.9
+PA;Itupiranga;0.9
+PA;Jacundá;0.9
+PA;Nova Ipixuna;1.1
+PA;Novo Repartimento;0.9
+PA;Tucuruí;0.9
+PA;Abel Figueiredo;0.9
+PA;Bom Jesus do Tocantins;0.9
+PA;Dom Eliseu;0.9
+PA;Goianésia do Pará;0.9
+PA;Paragominas;0.9
+PA;Rondon do Pará;0.9
+PA;Ulianópolis;0.9
+PA;Bannach;0.9
+PA;Cumaru do Norte;0.9
+PA;Ourilândia do Norte;1.1
+PA;São Félix do Xingu;0.9
+PA;Tucumã;0.9
+PA;Água Azul do Norte;0.9
+PA;Canaã dos Carajás;1.1
+PA;Curionópolis;1.1
+PA;Eldorado dos Carajás;0.9
+PA;Parauapebas;1.1
+PA;Brejo Grande do Araguaia;0.9
+PA;Marabá;1.1
+PA;Palestina do Pará;0.9
+PA;São Domingos do Araguaia;0.9
+PA;São João do Araguaia;0.9
+PA;Pau D'Arco;0.9
+PA;Piçarra;0.9
+PA;Redenção;0.9
+PA;Rio Maria;0.9
+PA;São Geraldo do Araguaia;1.1
+PA;Sapucaia;0.9
+PA;Xinguara;0.9
+PA;Conceição do Araguaia;0.9
+PA;Floresta do Araguaia;0.9
+PA;Santa Maria das Barreiras;0.9
+PA;Santana do Araguaia;0.9
+RO;Porto Velho;1.1
+RO;Nova Mamoré;1.1
+RO;Buritis;1.1
+RO;Campo Novo de Rondônia;1.1
+RO;Candeias do Jamari;1.1
+RO;Cujubim;1.1
+RO;Itapuã do Oeste;1.1
+RO;Costa Marques;0.9
+RO;Guajará-Mirim;0.9
+RO;São Francisco do Guaporé;0.9
+RO;Ariquemes;0.9
+RO;Machadinho D'Oeste;0.9
+RO;Rio Crespo;0.9
+RO;Alto Paraíso;0.9
+RO;Cacaulândia;0.9
+RO;Monte Negro;0.9
+RO;Vale do Anari;0.9
+RO;Jaru;0.9
+RO;Ji-Paraná;0.9
+RO;Ouro Preto do Oeste;0.9
+RO;Presidente Médici;0.9
+RO;Governador Jorge Teixeira;0.9
+RO;Mirante da Serra;0.9
+RO;Nova União;0.9
+RO;Teixeirópolis;0.9
+RO;Theobroma;0.9
+RO;Urupá;0.9
+RO;Vale do Paraíso;0.9
+RO;Nova Brasilândia D'Oeste;0.9
+RO;São Miguel do Guaporé;0.9
+RO;Alvorada D'Oeste;0.9
+RO;Seringueiras;0.9
+RO;Alta Floresta D'Oeste;0.9
+RO;Cacoal;0.9
+RO;Espigão D'Oeste;0.9
+RO;Rolim de Moura;0.9
+RO;Santa Luzia D'Oeste;0.9
+RO;Alto Alegre dos Parecis;0.9
+RO;Novo Horizonte do Oeste;0.9
+RO;Castanheiras;0.9
+RO;Ministro Andreazza;0.9
+RO;Pimenta Bueno;1.1
+RO;Vilhena;1.1
+RO;Chupinguaia;1.1
+RO;Parecis;1.1
+RO;Primavera de Rondônia;1.1
+RO;São Felipe D'Oeste;1.1
+RO;Cabixi;1.1
+RO;Cerejeiras;1.1
+RO;Colorado do Oeste;1.1
+RO;Corumbiara;1.1
+RO;Pimenteiras do Oeste;1.1
+RR;Amajari;0.9
+RR;Alto Alegre;0.9
+RR;Boa Vista;1.1
+RR;Pacaraima;0.9
+RR;Bonfim;0.9
+RR;Cantá;0.9
+RR;Normandia;0.9
+RR;Uiramutã;0.9
+RR;Caracaraí;0.9
+RR;Iracema;0.9
+RR;Mucajaí;0.9
+RR;Caroebe;0.9
+RR;Rorainópolis;0.9
+RR;São João da Baliza;0.9
+RR;São Luiz;0.9
+TO;Aguiarnópolis;1.1
+TO;Ananás;1.1
+TO;Angico;1.1
+TO;Araguatins;1.1
+TO;Augustinópolis;1.1
+TO;Axixá do Tocantins;1.1
+TO;Buriti do Tocantins;1.1
+TO;Cachoeirinha;1.1
+TO;Carrasco Bonito;1.1
+TO;Darcinópolis;1.1
+TO;Esperantina;1.1
+TO;Itaguatins;1.1
+TO;Luzinópolis;1.1
+TO;Maurilândia do Tocantins;1.1
+TO;Palmeiras do Tocantins;1.1
+TO;Nazaré;1.1
+TO;Praia Norte;1.1
+TO;Riachinho;1.1
+TO;Sampaio;1.1
+TO;Santa Terezinha do Tocantins;1.1
+TO;São Bento do Tocantins;1.1
+TO;São Miguel do Tocantins;1.1
+TO;São Sebastião do Tocantins;1.1
+TO;Sítio Novo do Tocantins;1.1
+TO;Tocantinópolis;1.1
+TO;Aragominas;0.9
+TO;Araguaína;0.9
+TO;Araguanã;0.9
+TO;Arapoema;0.9
+TO;Babaçulândia;0.9
+TO;Bandeirantes do Tocantins;0.9
+TO;Carmolândia;0.9
+TO;Colinas do Tocantins;0.9
+TO;Filadélfia;0.9
+TO;Muricilândia;0.9
+TO;Nova Olinda;0.9
+TO;Palmeirante;0.9
+TO;Pau D'Arco;0.9
+TO;Piraquê;0.9
+TO;Santa Fé do Araguaia;0.9
+TO;Wanderlândia;0.9
+TO;Xambioá;0.9
+TO;Abreulândia;0.9
+TO;Araguacema;0.9
+TO;Barrolândia;0.9
+TO;Bernardo Sayão;0.9
+TO;Brasilândia do Tocantins;0.9
+TO;Caseara;0.9
+TO;Couto DE Magalhães;0.9
+TO;Divinópolis do Tocantins;0.9
+TO;Dois Irmãos do Tocantins;0.9
+TO;Fortaleza do Tabocão;0.9
+TO;Goianorte;0.9
+TO;Guaraí;0.9
+TO;Itaporã do Tocantins;0.9
+TO;Juarina;0.9
+TO;Marianópolis do Tocantins;0.9
+TO;Miracema do Tocantins;0.9
+TO;Miranorte;0.9
+TO;Monte Santo do Tocantins;0.9
+TO;Pequizeiro;0.9
+TO;Colméia;0.9
+TO;Presidente Kennedy;0.9
+TO;Rio dos Bois;0.9
+TO;Tupirama;0.9
+TO;Tupiratins;0.9
+TO;Araguaçu;0.9
+TO;Chapada de Areia;0.9
+TO;Cristalândia;0.9
+TO;Dueré;0.9
+TO;Fátima;0.9
+TO;Formoso do Araguaia;0.9
+TO;Lagoa da Confusão;0.9
+TO;Nova Rosalândia;0.9
+TO;Oliveira de Fátima;0.9
+TO;Paraíso do Tocantins;0.9
+TO;Pium;0.9
+TO;Pugmil;0.9
+TO;Sandolândia;0.9
+TO;Aliança do Tocantins;1.1
+TO;Alvorada;1.1
+TO;Brejinho de Nazaré;1.1
+TO;Cariri do Tocantins;1.1
+TO;Crixás do Tocantins;1.1
+TO;Figueirópolis;1.1
+TO;Gurupi;1.1
+TO;Jaú do Tocantins;1.1
+TO;Palmeirópolis;1.1
+TO;Peixe;1.1
+TO;Santa Rita do Tocantins;1.1
+TO;São Salvador do Tocantins;1.1
+TO;Sucupira;1.1
+TO;Talismã;1.1
+TO;Aparecida do Rio Negro;1.1
+TO;Bom Jesus do Tocantins;1.1
+TO;Ipueiras;1.1
+TO;Lajeado;1.1
+TO;Monte do Carmo;1.1
+TO;Pedro Afonso;1.1
+TO;Porto Nacional;1.1
+TO;Santa Maria do Tocantins;1.1
+TO;Silvanópolis;1.1
+TO;Palmas;1.1
+TO;Tocantínia;1.1
+TO;Barra do Ouro;1.1
+TO;Campos Lindos;1.1
+TO;Centenário;1.1
+TO;Goiatins;1.1
+TO;Itacajá;1.1
+TO;Itapiratins;1.1
+TO;Lagoa do Tocantins;1.1
+TO;Lizarda;1.1
+TO;Mateiros;1.1
+TO;Novo Acordo;1.1
+TO;Ponte Alta do Tocantins;1.1
+TO;Recursolândia;1.1
+TO;Rio Sono;1.1
+TO;Santa Tereza do Tocantins;1.1
+TO;São Félix do Tocantins;1.1
+TO;Almas;1.1
+TO;Arraias;1.1
+TO;Aurora do Tocantins;1.1
+TO;Chapada da Natividade;1.1
+TO;Combinado;1.1
+TO;Conceição do Tocantins;1.1
+TO;Dianópolis;1.1
+TO;Lavandeira;1.1
+TO;Natividade;1.1
+TO;Novo Alegre;1.1
+TO;Novo Jardim;1.1
+TO;Paranã;1.1
+TO;Pindorama do Tocantins;1.1
+TO;Ponte Alta do Bom Jesus;1.1
+TO;Porto Alegre do Tocantins;1.1
+TO;Rio da Conceição;1.1
+TO;Santa Rosa do Tocantins;1.1
+TO;São Valério da Natividade;1.1
+TO;Taguatinga;1.1
+TO;Taipas do Tocantins;1.1

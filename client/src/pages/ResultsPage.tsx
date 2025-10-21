@@ -66,6 +66,8 @@ export function ResultsPage() {
     }
   };
 
+  console.log('result Size: ', result.companySize)
+
   return (
     <FormLayout>
       <div className="max-w-6xl mx-auto w-full p-8">

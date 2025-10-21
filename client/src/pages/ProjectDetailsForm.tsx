@@ -17,6 +17,11 @@ import { ChevronRight } from "lucide-react";
 import { FormLayout } from "@/components/FormLayout";
 import { Stepper } from "@/components/Stepper";
 
+const validations = [
+  {validacao: "SERVIÇO", prazo: 144 },
+  {validacao: "Comércio", prazo: 144 },
+]
+
 const projectDetailsSchema = z.object({
   activitySector: z.string().min(1, "Setor de atividade é obrigatório"),
   creditType: z.string().min(1, "Modalidade do crédito é obrigatória"),
@@ -27,23 +32,63 @@ const projectDetailsSchema = z.object({
   financedValue: z.string().min(1, "Valor financiado é obrigatório"),
   termMonths: z.string().min(1, "Prazo em meses é obrigatório"),
   graceMonths: z.string().min(1, "Carência em meses é obrigatória"),
+}).superRefine((data,ctx)=>{
+  const isInfra = data.activitySector?.toUpperCase() === "INFRA-ESTRUTURA"
+  const term = parseInt(data.termMonths, 10)
+  const grace = parseInt(data.graceMonths, 10)
+
+  if(isInfra && Number.isFinite(term) && term > 240){
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['termMonths'],
+      message: 'Para INFRA-ESTRUTURA, o prazo máximo é 240 meses',
+    })
+  }else{
+    if(data.activitySector?.toUpperCase() && term >144){
+      ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['termMonths'],
+      message: `Para ${data.activitySector?.toUpperCase()}, o prazo máximo é 144 meses`,
+    })
+    }
+  }
+  if(Number.isFinite(grace) && grace > 48){
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['graceMonths'],
+      message: `Para ${data.activitySector?.toUpperCase()}, a carência máxima é 48 meses`
+    })
+  }
 });
 
 type ProjectDetailsFormData = z.infer<typeof projectDetailsSchema>;
 
 const activitySectors = [
-  "Indústria",
-  "Comércio",
-  "Serviços",
-  "Agropecuária",
-  "Turismo",
+  "INFRA-ESTRUTURA",
+  "SERVIÇO",
+  "COMÉRCIO",
+  "INDÚSTRIA",
+  "AGRO-INDÚSTRIA",
+  "TURISMO"
 ];
 
 const creditTypes = [
-  "Investimento - Amazônia Empresarial",
-  "Investimento - Amazônia Florescer",
-  "Capital de Giro",
+  "INVESTIMENTOS - AMAZONIA EMPRESARIAL",
+  "CAPITAL DE GIRO",
+  "INVESTIMENTO PARA INFRAESTRUTURA ÁGUA, ESGOTO, LOGÍSTICA",
+  "OUTROS PROJETO DE INFRAESTRUTURA",
+  "PROJETO DE INVESTIMENTO EM INOVAÇÃO"
 ];
+
+const IndiceTypes = [
+  "Pré-fixado",
+  "Pós-fixado",
+]
+
+const AmortizationTypes = [
+  "PRICE",
+  "SAC",
+]
 
 const brazilianStates = [
   { value: "AM", label: "Amazonas" },
@@ -71,6 +116,8 @@ export function ProjectDetailsForm() {
     formState: { errors },
   } = useForm<ProjectDetailsFormData>({
     resolver: zodResolver(projectDetailsSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
   const watchedFinancedValue = watch("financedValue");
@@ -120,6 +167,63 @@ export function ProjectDetailsForm() {
     return formatted;
   };
 
+  const BRL_NUMBER_REGEX = /-?\d{1,3}(?:\.\d{3})*(?:,\d{2})?|^-?\d+(?:,\d{2})?/;
+  const extractBRL = (s: string): string => {
+    const m = s.match(BRL_NUMBER_REGEX);
+    return m ? m[0] : "0";
+  };
+  
+  const brlToNumber = (s: string): number => {
+    const numeric = extractBRL(s).replace(/\./g, "").replace(",", ".");
+    const n = Number(numeric);
+    return Number.isFinite(n) ? n : NaN;
+  };
+
+  const isGreaterThanLimit = (valueStr: string, limitStr: string): boolean => {
+    const value = brlToNumber(valueStr);                
+    const limit = brlToNumber(limitStr);              
+    return Number.isFinite(value) && Number.isFinite(limit) && value < limit;                
+  };
+                  
+  const debounce = <T extends (...args: any[]) => void>(fn: T, wait = 200) => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+    return (...args: Parameters<T>) => {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  };
+
+  const validateFinanciavel = debounce(
+    (valueStr: string, limitStr: string, formatted: string) => {
+      if (isGreaterThanLimit(valueStr, limitStr)) {
+        setValue("financedValue", formatted, { shouldValidate: true, shouldDirty: true });
+        setFinancedValue(formatted);
+      } else {
+        setValue("financedValue", projectValue, { shouldValidate: true, shouldDirty: true });
+        setFinancedValue(projectValue);
+      }
+    },
+    200
+  );
+
+  const limitFinance = (revenue:string, financed:string):string=>{
+    const formatedRevenue = brlToNumber(revenue)
+    const formatedFinanced = brlToNumber(financed);
+
+    if(formatedRevenue <= 4_800_000){
+      return formatCurrency((formatedFinanced).toString())
+    }
+    if(formatedRevenue > 4_800_000 && formatedRevenue <= 90_000_000){
+      return formatCurrency((formatedFinanced * 0.8).toFixed(2).toString())
+    }
+    if(formatedRevenue > 90_000_000 && formatedRevenue <= 300_000_000){
+      return formatCurrency((formatedFinanced * 0.6).toFixed(2).toString())
+    }else{
+      return formatCurrency((formatedFinanced * 0.6).toFixed(2).toString())
+    }
+
+  }
+
   return (
     <FormLayout>
       <div className="max-w-6xl mx-auto w-full p-8">
@@ -132,7 +236,7 @@ export function ProjectDetailsForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="activitySector">Setor de atividade</Label>
-            <Select onValueChange={(value) => setValue("activitySector", value)}>
+            <Select onValueChange={(value) => setValue("activitySector", value, { shouldValidate: true, shouldDirty: true })}>
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Selecione o setor" />
               </SelectTrigger>
@@ -144,6 +248,8 @@ export function ProjectDetailsForm() {
                 ))}
               </SelectContent>
             </Select>
+            {/* registra o valor no RHF para garantir validação pelo resolver */}
+            <input type="hidden" {...register("activitySector")} />
             {errors.activitySector && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.activitySector.message}
@@ -153,7 +259,7 @@ export function ProjectDetailsForm() {
 
           <div>
             <Label htmlFor="creditType">Modalidade do crédito</Label>
-            <Select onValueChange={(value) => setValue("creditType", value)}>
+            <Select onValueChange={(value) => setValue("creditType", value, { shouldValidate: true, shouldDirty: true })}>
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Selecione a modalidade" />
               </SelectTrigger>
@@ -165,6 +271,8 @@ export function ProjectDetailsForm() {
                 ))}
               </SelectContent>
             </Select>
+            {/* registra o valor no RHF para garantir validação pelo resolver */}
+            <input type="hidden" {...register("creditType")} />
             {errors.creditType && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.creditType.message}
@@ -179,7 +287,7 @@ export function ProjectDetailsForm() {
               {...register("annualRevenue")}
               onChange={(e) => {
                 const formatted = formatCurrency(e.target.value);
-                setValue("annualRevenue", formatted);
+                setValue("annualRevenue", formatted, { shouldValidate: true, shouldDirty: true });
               }}
               placeholder="R$ 230.000.000,00"
               className="mt-2"
@@ -196,7 +304,7 @@ export function ProjectDetailsForm() {
               <Label htmlFor="state">Estado</Label>
               <Select
                 onValueChange={(value) => {
-                  setValue("state", value);
+                  setValue("state", value, { shouldValidate: true, shouldDirty: true });
                   setSelectedState(value);
                 }}
               >
@@ -211,6 +319,8 @@ export function ProjectDetailsForm() {
                   ))}
                 </SelectContent>
               </Select>
+              {/* registra o valor no RHF para garantir validação pelo resolver */}
+              <input type="hidden" {...register("state")} />
               {errors.state && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.state.message}
@@ -221,7 +331,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="municipality">Município</Label>
               <Select
-                onValueChange={(value) => setValue("municipality", value)}
+                onValueChange={(value) => setValue("municipality", value, { shouldValidate: true, shouldDirty: true })}
                 disabled={!selectedState}
               >
                 <SelectTrigger className="mt-2">
@@ -236,6 +346,8 @@ export function ProjectDetailsForm() {
                     ))}
                 </SelectContent>
               </Select>
+              {/* registra o valor no RHF para garantir validação pelo resolver */}
+              <input type="hidden" {...register("municipality")} />
               {errors.municipality && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.municipality.message}
@@ -252,7 +364,7 @@ export function ProjectDetailsForm() {
                 {...register("projectValue")}
                 onChange={(e) => {
                   const formatted = formatCurrency(e.target.value);
-                  setValue("projectValue", formatted);
+                  setValue("projectValue", formatted,{ shouldValidate: true, shouldDirty: true });
                   setProjectValue(formatted);
                 }}
                 placeholder="R$ 170.000.000,00"
@@ -272,15 +384,16 @@ export function ProjectDetailsForm() {
                 {...register("financedValue")}
                 onChange={(e) => {
                   const formatted = formatCurrency(e.target.value);
-                  setValue("financedValue", formatted);
-                  setFinancedValue(formatted);
+
+                  validateFinanciavel(formatted, projectValue, formatted)
                 }}
+                disabled={!projectValue}
                 placeholder="R$ 170.000.000,00"
                 className="mt-2"
               />
               {watchedFinancedValue && (
                 <p className="text-sm text-gray-500 mt-1">
-                  Limite financiável: {watchedFinancedValue}
+                  Limite financiável: {limitFinance(watch('annualRevenue'),projectValue)}
                 </p>
               )}
               {errors.financedValue && (
@@ -320,6 +433,61 @@ export function ProjectDetailsForm() {
               {errors.graceMonths && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.graceMonths.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="state">Índice de correção</Label>
+              <Select
+                onValueChange={(value) => {
+                  setValue("state", value, { shouldValidate: true, shouldDirty: true });
+                  setSelectedState(value);
+                }}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Selecione o tipo de índice" />
+                </SelectTrigger>
+                <SelectContent>
+                  {IndiceTypes.map((item, pos) => (
+                    <SelectItem key={pos} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* registra o valor no RHF para garantir validação pelo resolver */}
+              <input type="hidden" {...register("state")} />
+              {errors.state && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.state.message}
+                </p>
+              )}
+            </div>
+            
+            <div>
+              <Label htmlFor="municipality">Sistema de Amortização</Label>
+              <Select
+                onValueChange={(value) => setValue("municipality", value, { shouldValidate: true, shouldDirty: true })}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Selecione o sistema" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AmortizationTypes.map((item, pos) => (
+                    <SelectItem key={pos} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* registra o valor no RHF para garantir validação pelo resolver */}
+              <input type="hidden" {...register("municipality")} />
+              {errors.municipality && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.municipality.message}
                 </p>
               )}
             </div>
