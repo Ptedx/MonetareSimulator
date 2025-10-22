@@ -16,6 +16,7 @@ import {
 import { ChevronRight } from "lucide-react";
 import { FormLayout } from "@/components/FormLayout";
 import { Stepper } from "@/components/Stepper";
+import { Controller } from "react-hook-form";
 
 const projectDetailsSchema = z.object({
   activitySector: z.string().min(1, "Setor de atividade é obrigatório"),
@@ -27,6 +28,9 @@ const projectDetailsSchema = z.object({
   financedValue: z.string().min(1, "Valor financiado é obrigatório"),
   termMonths: z.string().min(1, "Prazo em meses é obrigatório"),
   graceMonths: z.string(),
+  amortization: z.string().min(1, "Escolha da amortização é obrigatória"),
+  indice: z.string().min(1, "Escolha dos índices é obrigatório"),
+  punctualityDiscount: z.boolean().optional(),
 }).superRefine((data,ctx)=>{
   const isInfra = data.activitySector?.toUpperCase() === "INFRA-ESTRUTURA"
   const term = parseInt(data.termMonths, 10)
@@ -39,7 +43,7 @@ const projectDetailsSchema = z.object({
       message: 'Para INFRA-ESTRUTURA, o prazo máximo é 240 meses',
     })
   }else{
-    if(data.activitySector?.toUpperCase() && term >144){
+    if(!isInfra && term >144){
       ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['termMonths'],
@@ -68,16 +72,16 @@ const activitySectors = [
 ];
 
 const creditTypes = [
-  "INVESTIMENTOS - AMAZONIA EMPRESARIAL",
-  "CAPITAL DE GIRO",
-  "INVESTIMENTO PARA INFRAESTRUTURA ÁGUA, ESGOTO, LOGÍSTICA",
-  "OUTROS PROJETO DE INFRAESTRUTURA",
-  "PROJETO DE INVESTIMENTO EM INOVAÇÃO"
+  {value: 'INVESTIMENTO',label: "INVESTIMENTOS - AMAZONIA EMPRESARIAL"},
+  {value: 'CAPITAL_DE_GIRO',label: "CAPITAL DE GIRO"},
+  {value: 'INFRA_AGUA_ESGOTO_LOGISTICA',label: "INVESTIMENTO PARA INFRAESTRUTURA ÁGUA, ESGOTO, LOGÍSTICA"},
+  {value: 'INFRA_OUTROS',label: "OUTROS PROJETO DE INFRAESTRUTURA"},
+  {value: 'INOVACAO',label: "PROJETO DE INVESTIMENTO EM INOVAÇÃO"},
 ];
 
 const IndiceTypes = [
-  {value:"PRÉ", label: "Pré-fixado"},
-  {value:"PÓS", label: "Pós-fixado"},
+  {value:"PRE", label: "Pré-fixado"},
+  {value:"POS", label: "Pós-fixado"},
 ]
 
 const AmortizationTypes = [
@@ -96,6 +100,7 @@ const brazilianStates = [
 ];
 
 import { municipalities } from "../../../shared/municipalities";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function ProjectDetailsForm() {
   const [, navigate] = useLocation();
@@ -104,23 +109,28 @@ export function ProjectDetailsForm() {
   const [financedValue, setFinancedValue] = useState("");
   const [projectValue, setProjectValue] = useState("");
 
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    control,
+    formState: { errors, isValid },
   } = useForm<ProjectDetailsFormData>({
     resolver: zodResolver(projectDetailsSchema),
     mode: "onChange",
     reValidateMode: "onChange",
   });
 
+  const city = municipalities[selectedState] && municipalities[selectedState].filter(item=> item.city === watch('municipality'))?.[0]
+  const isPriority = city?.rate === 0.9
+
   const watchedFinancedValue = watch("financedValue");
 
   const onSubmit = async (data: ProjectDetailsFormData) => {
     const basicData = JSON.parse(localStorage.getItem("basicData") || "{}");
-    
+    console.log('basicData: ', basicData)
     const fullData = {
       ...basicData,
       ...data,
@@ -129,10 +139,12 @@ export function ProjectDetailsForm() {
       financedValue: parseFloat(data.financedValue.replace(/[^\d]/g, "")) / 100,
       termMonths: parseInt(data.termMonths),
       graceMonths: parseInt(data.graceMonths),
+      isPriority: isPriority,
+      punctualityDiscount: Boolean((data as any).punctualityDiscount),
     };
 
     try {
-      const response = await fetch("/api/simulate", {
+      const response = await fetch("/api/real-simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fullData),
@@ -147,7 +159,7 @@ export function ProjectDetailsForm() {
 
       localStorage.setItem("simulationResult", JSON.stringify(result));
       localStorage.setItem("simulationData", JSON.stringify(fullData));
-      navigate("/resultado");
+      // navigate("/resultado");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Erro ao processar a simulação. Por favor, tente novamente.");
@@ -205,8 +217,6 @@ export function ProjectDetailsForm() {
   const limitFinance = (revenue:string, financed:string):string=>{
     const formatedRevenue = brlToNumber(revenue)
     const formatedFinanced = brlToNumber(financed);
-    const city = municipalities[selectedState].filter(item=> item.city === watch('municipality'))?.[0]
-    const isPriority = city.rate === 0.9
     console.log('isPriority: ', isPriority)
 
     if(!isPriority && formatedRevenue <= 4_800_000){
@@ -226,6 +236,8 @@ export function ProjectDetailsForm() {
 
   }
 
+  console.log('punctualityDiscount: ', watch('punctualityDiscount'))
+
   return (
     <FormLayout>
       <div className="max-w-6xl mx-auto w-full p-8">
@@ -235,7 +247,7 @@ export function ProjectDetailsForm() {
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-8">Simulador de FNO</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={ handleSubmit(onSubmit, (e) => console.log('submit errors', e))} className="space-y-6">
           <div>
             <Label htmlFor="activitySector">Setor de atividade</Label>
             <Select onValueChange={(value) => setValue("activitySector", value, { shouldValidate: true, shouldDirty: true })}>
@@ -266,9 +278,9 @@ export function ProjectDetailsForm() {
                 <SelectValue placeholder="Selecione a modalidade" />
               </SelectTrigger>
               <SelectContent>
-                {creditTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
+                {creditTypes.map((type, pos) => (
+                  <SelectItem key={pos} value={type.value}>
+                    {type.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -445,8 +457,7 @@ export function ProjectDetailsForm() {
               <Label htmlFor="state">Índice de correção</Label>
               <Select
                 onValueChange={(value) => {
-                  setValue("state", value, { shouldValidate: true, shouldDirty: true });
-                  setSelectedState(value);
+                  setValue("indice", value, { shouldValidate: true, shouldDirty: true });
                 }}
               >
                 <SelectTrigger className="mt-2">
@@ -460,11 +471,11 @@ export function ProjectDetailsForm() {
                   ))}
                 </SelectContent>
               </Select>
-              {/* registra o valor no RHF para garantir validação pelo resolver */}
-              <input type="hidden" {...register("state")} />
-              {errors.state && (
+
+              <input type="hidden" {...register("indice")} />
+              {errors.indice && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.state.message}
+                  {errors.indice.message}
                 </p>
               )}
             </div>
@@ -472,7 +483,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="municipality">Sistema de Amortização</Label>
               <Select
-                onValueChange={(value) => setValue("municipality", value, { shouldValidate: true, shouldDirty: true })}
+                onValueChange={(value) => setValue("amortization", value, { shouldValidate: true, shouldDirty: true })}
               >
                 <SelectTrigger className="mt-2">
                   <SelectValue placeholder="Selecione o sistema" />
@@ -486,24 +497,42 @@ export function ProjectDetailsForm() {
                 </SelectContent>
               </Select>
               {/* registra o valor no RHF para garantir validação pelo resolver */}
-              <input type="hidden" {...register("municipality")} />
-              {errors.municipality && (
+              <input type="hidden" {...register("amortization")} />
+              {errors.amortization && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.municipality.message}
+                  {errors.amortization.message}
                 </p>
               )}
             </div>
           </div>
-          <div>
-            
-          </div>
-          <div className="flex justify-end pt-4">
-            <Button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white px-8"
-            >
-              Seguir <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <div className="flex items-center gap-2 mt-2">
+              <Controller
+                name="punctualityDiscount"
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <Checkbox
+                    id="punctualityDiscount"
+                    checked={!!field.value}
+                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=checked]:text-white"
+                  />
+                )}
+                />
+              <Label htmlFor="punctualityDiscount" className="mt-0">
+                Adicionar 15% desconto de pontualidade
+              </Label>
+            </div>
+            <div className="flex justify-end pt-4">
+              <Button
+                type="submit"
+                disabled={!isValid}
+                className="bg-green-500 hover:bg-green-600 text-white px-8"
+              >
+                Seguir <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </form>
           </div>
