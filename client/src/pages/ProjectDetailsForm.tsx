@@ -127,9 +127,9 @@ export function ProjectDetailsForm() {
   const isPriority = city?.rate === 0.9
 
   const watchedFinancedValue = watch("financedValue");
+  const basicData = JSON.parse(localStorage.getItem("basicData") || "{}");
 
   const onSubmit = async (data: ProjectDetailsFormData) => {
-    const basicData = JSON.parse(localStorage.getItem("basicData") || "{}");
     console.log('basicData: ', basicData)
     const fullData = {
       ...basicData,
@@ -237,6 +237,7 @@ export function ProjectDetailsForm() {
   }
 
   console.log('punctualityDiscount: ', watch('punctualityDiscount'))
+  console.log('basicData:', basicData)
 
   return (
     <FormLayout>

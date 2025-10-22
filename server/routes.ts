@@ -165,11 +165,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         system: amortization,
         indexAnnualPct: 4.5,
       }
+      const {data: idResult} = await axios.post('https://portal.monetare.com.br/rest/1/hsj2c13wxcl1rb7x/crm.contact.add.json', idRequestModel, headerOptions)
 
       const registerLeadModel = {
        "CATEGORY_ID":22, // pipeline da simulacao
        "TITLE": companyName, //nome da empresa
-       "CONTACT_ID":6862, // id do contato
+       "CONTACT_ID": idResult?.result, // id do contato
        "OPPORTUNITY": financedValue, // valor de financiamento
        "UF_CRM_1760982741839": projectValue, // valor do projeto
        "UF_CRM_1760982727361": annualRevenue, // receita bruta anual
@@ -183,18 +184,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
        "UF_CRM_1760974905323":state, //estado do projeto
        "UF_CRM_1760975444118":municipality //municio do projeto
     }
-
-
-    console.log('requestModel: ', requestModel)
     
-    const {data: idResult} = await axios.post('https://portal.monetare.com.br/rest/1/hsj2c13wxcl1rb7x/crm.contact.add.json', idRequestModel, headerOptions)
 
     console.log('idResult: ', idResult)
 
 
+    const {data: CRMResult} = await axios.post('https://portal.monetare.com.br/rest/34/xyq8gr4wpy4i7mwb/crm.deal.add.json', registerLeadModel, headerOptions)
+    
     const {data: result} = await axios.post('https://monetare-corporate.web.app/simulate', requestModel, headerOptions)
     
     console.log('Result: ', result)
+    console.log('CRMResult: ', CRMResult)
+
     return res.json(result)
 
 

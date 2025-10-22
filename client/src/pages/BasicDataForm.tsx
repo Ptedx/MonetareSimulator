@@ -25,7 +25,7 @@ const basicDataSchemaMasked = z.object({
   cnpj: z.preprocess((v)=> String(v ?? '').replace(/\D/g, ''), z.string().length(14, 'CNPJ deve ter 14 digitos')),
   email: z.string().email("E-mail inválido"),
   phone: z.preprocess((v)=> String(v ?? '').replace(/\D/g, ''), z.string().length(11, 'Telefone deve ter 11 digitos')),
-  state: z.string().min(1, "Estado é obrigatório"),
+  uf: z.string().min(1, "Estado é obrigatório"),
   clientcity: z.string().min(1, "Município é obrigatório"),
 });
 
@@ -137,6 +137,9 @@ export function BasicDataForm() {
 
   console.log('municipios: ', municipalities)
 
+  console.log('municipio: ',watch('clientcity'))
+  console.log('Estado: ', watch('uf'))
+  
 
   return (
     <FormLayout>
@@ -252,10 +255,10 @@ export function BasicDataForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="state">Estado</Label>
+              <Label htmlFor="uf">Estado</Label>
               <Select
                 onValueChange={(value) => {
-                  setValue("state", value, { shouldDirty: true, shouldValidate: true });
+                  setValue("uf", value, { shouldDirty: true, shouldValidate: true });
                   setSelectedState(value);
                   getMunicipalities(value)
                   setValue("clientcity", '', { shouldDirty: true, shouldValidate: true });
@@ -274,9 +277,9 @@ export function BasicDataForm() {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.state && (
+              {errors.uf && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.state.message}
+                  {errors.uf.message}
                 </p>
               )}
             </div>
@@ -303,7 +306,7 @@ export function BasicDataForm() {
                 </SelectContent>
               </Select>
               {/* garante registro dos campos para validação do RHF */}
-              <input type="hidden" {...register("state")} />
+              <input type="hidden" {...register("uf")} />
               <input type="hidden" {...register("clientcity")} />
               {errors.clientcity && (
                 <p className="text-red-500 text-sm mt-1">
