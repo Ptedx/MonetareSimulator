@@ -1,23 +1,46 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-interface SimulationResult {
-  companySize: string;
-  priorityMunicipality: boolean;
-  interestRate: string;
-  financedValue: number;
-  totalPaid: number;
-  firstInstallment: number;
-  totalInterest: number;
+// Shape of API result from /api/real-simulate
+export interface ApiScheduleRow {
+  month: number;
+  installment: number;
+  interest: number;
+  amortization: number;
+  indexAdj: number;
+  balance: number;
 }
 
-interface SimulationData {
+export interface ApiResult {
+  entrada: {
+    produto: string;
+    rateMode: "PRE" | "POS";
+    bonusPontualidade: boolean;
+    prioridade: "PRIORITARIA" | "NAO-PRIORITARIA";
+    modalidade: string;
+    uf: string;
+    municipio: string;
+  };
+  taxas: {
+    taxaMunicipio: number;
+    taxaAplicadaAnual: number; // percent per year
+    taxaMensalPct: number; // percent per month
+    indexMonthlyPct: number;
+  };
+  schedule: ApiScheduleRow[];
+  firstInstallment: number;
+  totalPaid: number;
+  totalInterest: number;
+  endingBalance: number;
+}
+
+export interface SimulationData {
   name: string;
   companyName: string;
   cnpj: string;
   email: string;
   phone: string;
-  municipality: string;
+  municipality: string; // project city
   activitySector: string;
   creditType: string;
   annualRevenue: number;
@@ -25,223 +48,179 @@ interface SimulationData {
   financedValue: number;
   termMonths: number;
   graceMonths: number;
+  state?: string;
 }
 
-interface PaymentScheduleRow {
-  month: number;
-  payment: number;
-  principal: number;
-  interest: number;
-  balance: number;
-}
+const colors = {
+  brand: [14, 101, 69] as [number, number, number], // dark green
+  brandLight: [227, 242, 236] as [number, number, number],
+  text: [22, 28, 45] as [number, number, number],
+  muted: [108, 114, 128] as [number, number, number],
+  border: [229, 231, 235] as [number, number, number],
+};
 
-export function generatePDF(result: SimulationResult, data: SimulationData) {
-  const doc = new jsPDF();
-  
-  // Cores da plataforma
-  const primaryGreen: [number, number, number] = [16, 185, 129]; // #10b981
-  const darkGreen: [number, number, number] = [5, 122, 85]; // Verde escuro
-  const textGray: [number, number, number] = [55, 65, 81]; // Cinza do texto
-  
-  // Cabeçalho
-  doc.setFillColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
-  doc.rect(0, 0, 210, 40, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(24);
-  doc.setFont("helvetica", "bold");
-  doc.text("Simulação de Financiamento FNO", 105, 20, { align: "center" });
-  
+const currency = (n: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n ?? 0);
+
+const formatPct = (n: number) => `${n.toFixed(2).replace(".", ",")}%`;
+
+export function generatePDF(api: ApiResult, data: SimulationData) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...colors.text);
+
+  // Header
+  doc.setFillColor(...colors.brandLight);
+  doc.rect(0, 0, 210, 18, "F");
   doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.text("Monetare Corporate", 105, 30, { align: "center" });
-  
-  // Reset para texto normal
-  doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-  
-  let yPos = 50;
-  
-  // Dados do Cliente
-  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("Dados do Cliente", 14, yPos);
-  yPos += 10;
-  
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Nome: ${data.name}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Empresa: ${data.companyName}`, 14, yPos);
-  yPos += 6;
-  doc.text(`CNPJ: ${data.cnpj}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Email: ${data.email}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Telefone: ${data.phone}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Município: ${data.municipality}`, 14, yPos);
-  yPos += 12;
-  
-  // Informações do Financiamento
-  doc.setFontSize(16);
+  doc.setTextColor(...colors.brand);
+  doc.text("monetare", 14, 12);
+  doc.setTextColor(...colors.text);
+
+  // Title
+  doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
-  doc.text("Informações do Financiamento", 14, yPos);
-  yPos += 10;
-  
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Porte da Empresa: ${result.companySize}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Setor de Atividade: ${data.activitySector}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Modalidade: ${data.creditType}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Taxa de Juros: ${result.interestRate}`, 14, yPos);
-  yPos += 6;
-  if (result.priorityMunicipality) {
-    doc.text(`Município Prioritário: Sim (desconto aplicado)`, 14, yPos);
-    yPos += 6;
-  }
-  yPos += 6;
-  
-  // Resumo Financeiro
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Resumo Financeiro", 14, yPos);
-  yPos += 10;
-  
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-  
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Valor do Projeto: ${formatCurrency(data.projectValue)}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Valor Financiado: ${formatCurrency(result.financedValue)}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Prazo Total: ${data.termMonths} meses`, 14, yPos);
-  yPos += 6;
-  doc.text(`Carência: ${data.graceMonths} meses`, 14, yPos);
-  yPos += 6;
-  doc.text(`Primeira Parcela após Carência: ${formatCurrency(result.firstInstallment)}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Total a Pagar: ${formatCurrency(result.totalPaid)}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Total de Juros: ${formatCurrency(result.totalInterest)}`, 14, yPos);
-  yPos += 12;
-  
-  // Calcular cronograma de pagamentos
-  const paymentSchedule = calculatePaymentSchedule(
-    result.financedValue,
-    data.termMonths,
-    data.graceMonths,
-    parseFloat(result.interestRate.split('%')[0])
-  );
-  
-  // Nova página para a tabela
-  doc.addPage();
-  yPos = 20;
-  
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Cronograma de Pagamentos", 14, yPos);
-  yPos += 10;
-  
-  // Tabela de pagamentos
-  const tableData = paymentSchedule.map(row => [
-    row.month.toString(),
-    formatCurrency(row.payment),
-    formatCurrency(row.principal),
-    formatCurrency(row.interest),
-    formatCurrency(row.balance),
-  ]);
-  
-  autoTable(doc, {
-    startY: yPos,
-    head: [['Mês', 'Parcela', 'Amortização', 'Juros', 'Saldo Devedor']],
-    body: tableData,
-    theme: 'striped',
-    headStyles: {
-      fillColor: primaryGreen,
-      textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 10,
+  doc.text("Resumo da sua simulação", 14, 32);
+
+  // Summary card (left)
+  const leftX = 14;
+  const leftY = 38;
+  const leftW = 100;
+  const leftH = 80;
+  doc.setDrawColor(...colors.border);
+  doc.roundedRect(leftX, leftY, leftW, leftH, 2, 2, "S");
+
+  const items = [
+    { label: "Valor financiado", value: currency(data.financedValue) },
+    { label: "Total pago", value: currency(api.totalPaid) },
+    {
+      label: "Primeira parcela após a carência",
+      value: currency(api.firstInstallment),
     },
-    styles: {
-      fontSize: 9,
-      cellPadding: 3,
+    {
+      label: `Taxa de juros${api.entrada.rateMode === "PRE" ? " (Pré-fixada)" : " (Pós-fixada)"}`,
+      value: `${formatPct(api.taxas.taxaAplicadaAnual)} a.a.`,
     },
-    alternateRowStyles: {
-      fillColor: [249, 250, 251],
-    },
-    margin: { left: 14, right: 14 },
+  ];
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  let y = leftY + 16;
+  items.forEach((it, idx) => {
+    doc.text(it.value, leftX + 6, y);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...colors.muted);
+    doc.text(it.label, leftX + 6, y + 5);
+    doc.setTextColor(...colors.text);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    // Add chip for rate mode on the last line
+    if (idx === items.length - 1) {
+      const modeText = api.entrada.rateMode === "POS" ? "Pós-fixada" : "Pré-fixada";
+      const chipW = doc.getTextWidth(modeText) + 8;
+      const chipX = leftX + 6 + doc.getTextWidth(it.value) + 6;
+      const chipY = y + 1.5;
+      doc.setFillColor(...colors.brand);
+      doc.roundedRect(chipX, chipY - 5, chipW, 8, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.text(modeText, chipX + 4, chipY);
+      doc.setTextColor(...colors.text);
+      doc.setFontSize(20);
+    }
+    y += 18;
   });
-  
-  // Rodapé em todas as páginas
+
+  // Right info panel
+  const rightX = 120;
+  const rightY = 38;
+  const rightW = 76;
+  const rightH = 80;
+  doc.roundedRect(rightX, rightY, rightW, rightH, 2, 2, "S");
+
+  const chip = (text: string, x: number, y: number, color: [number, number, number]) => {
+    doc.setDrawColor(...color);
+    doc.setFillColor(...color);
+    const w = doc.getTextWidth(text) + 8;
+    doc.roundedRect(x, y - 5, w, 8, 2, 2, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.text(text, x + 4, y);
+    doc.setTextColor(...colors.text);
+  };
+
+  let ry = rightY + 10;
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Empresa`, rightX + 6, ry); ry += 5;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(data.companyName || "—", rightX + 6, ry); ry += 8;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(`CNPJ`, rightX + 6, ry); ry += 5;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(data.cnpj || "—", rightX + 6, ry); ry += 8;
+  if (api.entrada.prioridade === "PRIORITARIA") {
+    chip("Município Prioritário", rightX + 6, ry, colors.brand); ry += 12;
+  }
+  if (api.entrada.bonusPontualidade) { chip("Desconto de Pontualidade", rightX + 6, ry, colors.brand); ry += 12; }
+  doc.setFontSize(10); doc.setFont("helvetica", "normal");
+  doc.text(`Receita Bruta Anual`, rightX + 6, ry); ry += 5;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+  doc.text(currency(data.annualRevenue), rightX + 6, ry); ry += 8;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+  doc.text(`Setor de atividade`, rightX + 6, ry); ry += 5;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+  doc.text(data.activitySector || "—", rightX + 6, ry); ry += 8;
+
+  // Second block under the two panels
+  const secondY = leftY + leftH + 10;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Cronograma de parcelas", leftX, secondY);
+
+  // Table with schedule
+  const body = (api.schedule || []).map((r) => [
+    r.month,
+    currency(r.installment),
+    currency(r.interest),
+    currency(r.amortization),
+    currency(r.balance),
+  ]);
+
+  autoTable(doc, {
+    startY: secondY + 4,
+    head: [["Mês", "Parcela (R$)", "Juros (R$)", "Amortização (R$)", "Saldo devedor (R$)"]],
+    body,
+    theme: "grid",
+    headStyles: { fillColor: colors.brand, textColor: [255, 255, 255], fontStyle: "bold" },
+    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: leftX, right: leftX },
+    columnStyles: { 0: { cellWidth: 14 } },
+  });
+
+  // Footer for every page
   const pageCount = doc.getNumberOfPages();
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const yyyy = today.getFullYear();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(9);
-    doc.setTextColor(128, 128, 128);
-    doc.text(
-      `© ${new Date().getFullYear()} Monetare Corporate - Página ${i} de ${pageCount}`,
-      105,
-      290,
-      { align: "center" }
-    );
+    doc.setTextColor(...colors.muted);
+    doc.text(`Simulação feita em ${dd}/${mm}/${yyyy}. Válida por 5 dias.`, 14, 290);
+    doc.text(`${i}/${pageCount}`, 105, 290, { align: "center" });
+    doc.text(`© ${yyyy} Monetare Corporate LTDA`, 196, 290, { align: "right" });
   }
-  
-  // Salvar o PDF
-  const fileName = `simulacao_${data.companyName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(fileName);
-}
 
-function calculatePaymentSchedule(
-  financedValue: number,
-  termMonths: number,
-  graceMonths: number,
-  annualRate: number
-): PaymentScheduleRow[] {
-  const schedule: PaymentScheduleRow[] = [];
-  const monthlyRate = annualRate / 100 / 12;
-  const effectiveTermMonths = termMonths - graceMonths;
-  
-  // Cálculo da parcela usando o sistema Price (parcelas fixas)
-  const installment = financedValue * (monthlyRate * Math.pow(1 + monthlyRate, effectiveTermMonths)) / 
-                      (Math.pow(1 + monthlyRate, effectiveTermMonths) - 1);
-  
-  let balance = financedValue;
-  
-  // Período de carência (apenas juros)
-  for (let i = 1; i <= graceMonths; i++) {
-    const interest = balance * monthlyRate;
-    schedule.push({
-      month: i,
-      payment: interest,
-      principal: 0,
-      interest: interest,
-      balance: balance,
-    });
-  }
-  
-  // Período de amortização
-  for (let i = graceMonths + 1; i <= termMonths; i++) {
-    const interest = balance * monthlyRate;
-    const principal = installment - interest;
-    balance -= principal;
-    
-    schedule.push({
-      month: i,
-      payment: installment,
-      principal: principal,
-      interest: interest,
-      balance: Math.max(0, balance), // Evita valores negativos por aproximação
-    });
-  }
-  
-  return schedule;
+  const fileName = `simulacao_${(data.companyName || "empresa")
+    .toString()
+    .replace(/\s+/g, "_")}_${yyyy}-${mm}-${dd}.pdf`;
+  doc.save(fileName);
 }

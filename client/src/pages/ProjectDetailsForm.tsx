@@ -159,7 +159,7 @@ export function ProjectDetailsForm() {
 
       localStorage.setItem("simulationResult", JSON.stringify(result));
       localStorage.setItem("simulationData", JSON.stringify(fullData));
-      // navigate("/resultado");
+      navigate("/resultado");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Erro ao processar a simulação. Por favor, tente novamente.");
