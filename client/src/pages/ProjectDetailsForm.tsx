@@ -129,7 +129,7 @@ export function ProjectDetailsForm() {
   const watchedFinancedValue = watch("financedValue");
   const basicData = JSON.parse(sessionStorage.getItem("basicData") || "{}");
 
-  if (!basicData) navigate('/')
+  if (!sessionStorage.getItem("basicData")) navigate('/')
 
   const onSubmit = async (data: ProjectDetailsFormData) => {
     console.log('basicData: ', basicData)
