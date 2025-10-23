@@ -132,7 +132,6 @@ export function BasicDataForm() {
     defaultValues: basicDefaults?.defaults as any,
   });
 
-  // utils: masks and debounced validation
   const onlyDigits = (s: string) => s.replace(/\D/g, "");
   const formatPhone = (digits: string) => {
     const d = digits.slice(0, 11);
@@ -180,12 +179,10 @@ export function BasicDataForm() {
     navigate("/projeto");
   };
 
-  // Carrega munícipios quando já temos UF inicial (reidratação)
   useEffect(() => {
     if (selectedState) getMunicipalities(selectedState);
   }, [selectedState]);
 
-  // Aplica clientcity somente após lista carregada para garantir que exista nas opções
   useEffect(() => {
     const savedCity = (basicDefaults?.defaults?.clientcity as string) || '';
     if (!selectedState || !savedCity) return;
@@ -206,16 +203,9 @@ export function BasicDataForm() {
       setMunicipalities(ufList)
     }catch(err){
       console.warn('Falha ao buscar municípios (ignorado):', err)
-      // Mantém estrutura compatível com uso atual (municipalities.data?.map)
       setMunicipalities({ data: [] })
     }
   }
-
-  console.log('municipios: ', municipalities)
-
-  console.log('municipio: ',watch('clientcity'))
-  console.log('Estado: ', watch('uf'))
-  
 
   return (
     <FormLayout>
@@ -382,7 +372,6 @@ export function BasicDataForm() {
                     ))}
                 </SelectContent>
               </Select>
-              {/* garante registro dos campos para validação do RHF */}
               <input type="hidden" {...register("uf")} />
               <input type="hidden" {...register("clientcity")} />
               {errors.clientcity && (

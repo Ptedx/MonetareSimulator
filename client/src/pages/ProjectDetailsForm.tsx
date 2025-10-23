@@ -105,7 +105,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 export function ProjectDetailsForm() {
   const [, navigate] = useLocation();
 
-  // Defaults vindos do sessionStorage para reidratar imediatamente (antes do primeiro render)
   const simDefaults = (() => {
     try {
       const raw = sessionStorage.getItem("simulationData");
@@ -210,7 +209,6 @@ export function ProjectDetailsForm() {
     return formatted;
   };
 
-  // Garante que o município só seja aplicado após o estado estar definido (lista carregada)
   useEffect(() => {
     const raw = sessionStorage.getItem("simulationData");
     if (!raw) return;
@@ -315,7 +313,6 @@ export function ProjectDetailsForm() {
                 ))}
               </SelectContent>
             </Select>
-            {/* registra o valor no RHF para garantir validação pelo resolver */}
             <input type="hidden" {...register("activitySector")} />
             {errors.activitySector && (
               <p className="text-red-500 text-sm mt-1">
@@ -341,7 +338,6 @@ export function ProjectDetailsForm() {
                 ))}
               </SelectContent>
             </Select>
-            {/* registra o valor no RHF para garantir validação pelo resolver */}
             <input type="hidden" {...register("creditType")} />
             {errors.creditType && (
               <p className="text-red-500 text-sm mt-1">
@@ -377,7 +373,6 @@ export function ProjectDetailsForm() {
                 onValueChange={(value) => {
                   setValue("state", value, { shouldValidate: true, shouldDirty: true });
                   setSelectedState(value);
-                  // Ao trocar o estado, limpamos o município para refletir na UI e na validação
                   setValue("municipality", "", { shouldValidate: true, shouldDirty: true });
                 }}
               >
@@ -392,7 +387,6 @@ export function ProjectDetailsForm() {
                   ))}
                 </SelectContent>
               </Select>
-              {/* registra o valor no RHF para garantir validação pelo resolver */}
               <input type="hidden" {...register("state")} />
               {errors.state && (
                 <p className="text-red-500 text-sm mt-1">
@@ -420,7 +414,6 @@ export function ProjectDetailsForm() {
                     ))}
                 </SelectContent>
               </Select>
-              {/* registra o valor no RHF para garantir validação pelo resolver */}
               <input type="hidden" {...register("municipality")} />
               {errors.municipality && (
                 <p className="text-red-500 text-sm mt-1">
@@ -558,7 +551,6 @@ export function ProjectDetailsForm() {
                   ))}
                 </SelectContent>
               </Select>
-              {/* registra o valor no RHF para garantir validação pelo resolver */}
               <input type="hidden" {...register("amortization")} />
               {errors.amortization && (
                 <p className="text-red-500 text-sm mt-1">
