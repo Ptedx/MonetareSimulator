@@ -377,6 +377,8 @@ export function ProjectDetailsForm() {
                 onValueChange={(value) => {
                   setValue("state", value, { shouldValidate: true, shouldDirty: true });
                   setSelectedState(value);
+                  // Ao trocar o estado, limpamos o município para refletir na UI e na validação
+                  setValue("municipality", "", { shouldValidate: true, shouldDirty: true });
                 }}
               >
                 <SelectTrigger className="mt-2">
