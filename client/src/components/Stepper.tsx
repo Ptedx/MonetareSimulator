@@ -13,7 +13,6 @@ export function Stepper({ currentStep }: StepperProps) {
 
   return (
     <>
-      {/* Mobile/Tablet: Horizontal stepper */}
       <div className="flex items-center gap-4 mb-8 lg:hidden">
         {steps.map((step, index) => (
           <div key={step.id} className="flex items-center gap-2 flex-1">
@@ -54,7 +53,6 @@ export function Stepper({ currentStep }: StepperProps) {
         ))}
       </div>
 
-      {/* Desktop: Vertical stepper on the left */}
       <div className="hidden lg:flex flex-col gap-8 min-w-[200px]">
         {steps.map((step, index) => (
           <div key={step.id} className="flex flex-col">

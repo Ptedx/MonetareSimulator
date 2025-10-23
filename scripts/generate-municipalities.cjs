@@ -11,14 +11,13 @@ function detectDelimiter(headerLine) {
 }
 
 function splitSafe(line, delimiter) {
-  // simples e rápido: funciona se não houver vírgula/; dentro de aspas
-  // se seu CSV tiver valores com vírgula/; entre aspas, use uma lib (PapaParse/csv-parse)
+ 
   return line.split(delimiter);
 }
 
 function main() {
   let text = fs.readFileSync(CSV_PATH, "utf8");
-  text = text.replace(/^\uFEFF/, ""); // remove BOM se houver
+  text = text.replace(/^\uFEFF/, ""); 
   const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
   if (lines.length === 0) throw new Error("CSV vazio.");
 

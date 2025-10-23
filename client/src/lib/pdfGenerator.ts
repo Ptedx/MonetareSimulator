@@ -118,7 +118,6 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
     doc.setTextColor(...colors.text);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    // Add chip for rate mode on the last line
     if (idx === items.length - 1) {
       const modeText = api.entrada.rateMode === "POS" ? "Pós-fixada" : "Pré-fixada";
       const chipW = doc.getTextWidth(modeText) - 6;
@@ -139,7 +138,6 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
     y += 18;
   });
 
-  // Right info panel
   const rightX = 120;
   const rightY = 38;
   const rightW = 76;
@@ -183,13 +181,11 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
   doc.setFont("helvetica", "bold"); doc.setFontSize(12);
   doc.text(data.activitySector || "—", rightX + 6, ry); ry += 8;
 
-  // Second block under the two panels
   const secondY = leftY + leftH + 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Cronograma de parcelas", leftX, secondY);
 
-  // Table with schedule
   const body = (api.schedule || []).map((r) => [
     r.month,
     currency(r.installment),
@@ -209,7 +205,6 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
     columnStyles: { 0: { cellWidth: 14 } },
   });
 
-  // Footer for every page
   const pageCount = doc.getNumberOfPages();
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
