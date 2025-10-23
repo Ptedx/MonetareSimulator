@@ -109,6 +109,7 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
   doc.setFontSize(20);
   let y = leftY + 16;
   items.forEach((it, idx) => {
+    const chipH = 8;
     doc.text(it.value, leftX + 6, y);
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
@@ -120,14 +121,18 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
     // Add chip for rate mode on the last line
     if (idx === items.length - 1) {
       const modeText = api.entrada.rateMode === "POS" ? "Pós-fixada" : "Pré-fixada";
-      const chipW = doc.getTextWidth(modeText) + 8;
-      const chipX = leftX + 6 + doc.getTextWidth(it.value) + 6;
-      const chipY = y + 1.5;
+      const chipW = doc.getTextWidth(modeText) - 6;
+      const chipX = leftX + 6 + doc.getTextWidth(it.value) + 2;
+      const chipY = y - 2;
+      const chipTop = y - 6;
+
       doc.setFillColor(...colors.brand);
       doc.roundedRect(chipX, chipY - 5, chipW, 8, 2, 2, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(9);
-      doc.text(modeText, chipX + 4, chipY);
+      const textX = chipX + chipW / 2;
+      const textY = chipTop + chipH / 2;
+      doc.text(modeText, textX, textY, { align: "center"});
       doc.setTextColor(...colors.text);
       doc.setFontSize(20);
     }
