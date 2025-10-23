@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -63,7 +63,59 @@ const brazilianStates = [
 
 export function BasicDataForm() {
   const [, navigate] = useLocation();
-  const [selectedState, setSelectedState] = useState("");
+
+  // Defaults vindos do sessionStorage para reidratar imediatamente
+  const basicDefaults = (() => {
+    try {
+      const raw = sessionStorage.getItem('basicData');
+      if (!raw) return null;
+      const d = JSON.parse(raw) as Partial<BasicDataFormData>;
+
+      // formatações locais para uso antes das helpers
+      const fmtPhone = (value?: string) => {
+        const digits = String(value ?? '').replace(/\D/g, '').slice(0, 11);
+        const p1 = digits.slice(0, 2);
+        const p2 = digits.slice(2, 3);
+        const p3 = digits.slice(3, 7);
+        const p4 = digits.slice(7, 11);
+        let out = p1;
+        if (digits.length > 2) out = `${p1} ${p2}`;
+        if (digits.length > 3) out = `${p1} ${p2} ${p3}`;
+        if (digits.length > 7) out = `${p1} ${p2} ${p3}-${p4}`;
+        return out;
+      };
+      const fmtCnpj = (value?: string) => {
+        const digits = String(value ?? '').replace(/\D/g, '').slice(0, 14);
+        const a = digits.slice(0, 2);
+        const b = digits.slice(2, 5);
+        const c = digits.slice(5, 8);
+        const e = digits.slice(8, 12);
+        const f = digits.slice(12, 14);
+        let out = a;
+        if (digits.length > 2) out = `${a}.${b}`;
+        if (digits.length > 5) out = `${a}.${b}.${c}`;
+        if (digits.length > 8) out = `${a}.${b}.${c}/${e}`;
+        if (digits.length > 12) out = `${a}.${b}.${c}/${e}-${f}`;
+        return out;
+      };
+
+      const defaults: Partial<BasicDataFormData> = {};
+      if (d.name) defaults.name = String(d.name);
+      if (d.lastname) defaults.lastname = String(d.lastname);
+      if (d.companyName) defaults.companyName = String(d.companyName);
+      if (d.email) defaults.email = String(d.email);
+      if (d.uf) defaults.uf = String(d.uf);
+      if (d.clientcity) defaults.clientcity = String(d.clientcity);
+      if (d.phone) defaults.phone = fmtPhone(String(d.phone));
+      if (d.cnpj) defaults.cnpj = fmtCnpj(String(d.cnpj));
+
+      return { defaults, initState: (defaults.uf as string) || "" };
+    } catch {
+      return null;
+    }
+  })();
+
+  const [selectedState, setSelectedState] = useState<string>(() => basicDefaults?.initState ?? "");
   const [municipalities, setMunicipalities] = useState<any>([])
 
   const {
@@ -77,6 +129,7 @@ export function BasicDataForm() {
     resolver: zodResolver(basicDataSchemaMasked),
     mode: 'onChange',
     reValidateMode: 'onChange',
+    defaultValues: basicDefaults?.defaults as any,
   });
 
   // utils: masks and debounced validation
@@ -127,11 +180,35 @@ export function BasicDataForm() {
     navigate("/projeto");
   };
 
+  // Carrega munícipios quando já temos UF inicial (reidratação)
+  useEffect(() => {
+    if (selectedState) getMunicipalities(selectedState);
+  }, [selectedState]);
+
+  // Aplica clientcity somente após lista carregada para garantir que exista nas opções
+  useEffect(() => {
+    const savedCity = (basicDefaults?.defaults?.clientcity as string) || '';
+    if (!selectedState || !savedCity) return;
+    const list = municipalities?.data as any[] | undefined;
+    if (Array.isArray(list) && list.some((c) => c?.nome === savedCity)) {
+      setValue('clientcity', savedCity, { shouldValidate: true });
+    }
+  }, [municipalities, selectedState, setValue]);
+
   async function getMunicipalities(UF:string){
-    console.log('fui chamada!', UF)
-    const ufList = await axios.get(`https://brasilapi.com.br/api/ibge/municipios/v1/${UF}?providers=dados-abertos-br,gov,wikipedia`)
-    console.log('UFLIST: ',ufList)
-    setMunicipalities(ufList)
+    try{
+      if(!UF) return;
+      console.log('fui chamada!', UF)
+      const ufList = await axios.get(
+        `https://brasilapi.com.br/api/ibge/municipios/v1/${encodeURIComponent(UF)}?providers=dados-abertos-br,gov,wikipedia`
+      )
+      console.log('UFLIST: ',ufList)
+      setMunicipalities(ufList)
+    }catch(err){
+      console.warn('Falha ao buscar municípios (ignorado):', err)
+      // Mantém estrutura compatível com uso atual (municipalities.data?.map)
+      setMunicipalities({ data: [] })
+    }
   }
 
   console.log('municipios: ', municipalities)
@@ -256,6 +333,7 @@ export function BasicDataForm() {
             <div>
               <Label htmlFor="uf">Estado</Label>
               <Select
+                value={watch('uf') || undefined}
                 onValueChange={(value) => {
                   setValue("uf", value, { shouldDirty: true, shouldValidate: true });
                   setSelectedState(value);

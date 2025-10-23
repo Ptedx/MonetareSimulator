@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -104,10 +104,42 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export function ProjectDetailsForm() {
   const [, navigate] = useLocation();
-  const [selectedState, setSelectedState] = useState("");
+
+  // Defaults vindos do sessionStorage para reidratar imediatamente (antes do primeiro render)
+  const simDefaults = (() => {
+    try {
+      const raw = sessionStorage.getItem("simulationData");
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      const fmt = (v: any) => {
+        const n = Number(v);
+        return Number.isFinite(n)
+          ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
+          : undefined;
+      };
+      const defaults: Partial<ProjectDetailsFormData> = {};
+      if (d.activitySector) defaults.activitySector = String(d.activitySector);
+      if (d.creditType) defaults.creditType = String(d.creditType);
+      if (d.state) defaults.state = String(d.state);
+      if (d.municipality) defaults.municipality = String(d.municipality);
+      if (d.indice) defaults.indice = String(d.indice);
+      if (d.amortization) defaults.amortization = String(d.amortization);
+      if (typeof d.termMonths !== "undefined") defaults.termMonths = String(d.termMonths);
+      if (typeof d.graceMonths !== "undefined") defaults.graceMonths = String(d.graceMonths);
+      if (typeof d.punctualityDiscount !== "undefined") (defaults as any).punctualityDiscount = Boolean(d.punctualityDiscount) as any;
+      if (typeof d.annualRevenue !== "undefined") defaults.annualRevenue = fmt(d.annualRevenue);
+      if (typeof d.projectValue !== "undefined") defaults.projectValue = fmt(d.projectValue);
+      if (typeof d.financedValue !== "undefined") defaults.financedValue = fmt(d.financedValue);
+      return { defaults, initState: (defaults.state as string) || "" };
+    } catch {
+      return null;
+    }
+  })();
+
+  const [selectedState, setSelectedState] = useState<string>(() => simDefaults?.initState ?? "");
   const [selectedCity, setSelectedCity] = useState({city: '', rate:null})
-  const [financedValue, setFinancedValue] = useState("");
-  const [projectValue, setProjectValue] = useState("");
+  const [financedValue, setFinancedValue] = useState<string>(() => (simDefaults?.defaults?.financedValue as string) ?? "");
+  const [projectValue, setProjectValue] = useState<string>(() => (simDefaults?.defaults?.projectValue as string) ?? "");
 
 
   const {
@@ -121,6 +153,7 @@ export function ProjectDetailsForm() {
     resolver: zodResolver(projectDetailsSchema),
     mode: "onChange",
     reValidateMode: "onChange",
+    defaultValues: simDefaults?.defaults as any,
   });
 
   const city = municipalities[selectedState] && municipalities[selectedState].filter(item=> item.city === watch('municipality'))?.[0]
@@ -176,6 +209,20 @@ export function ProjectDetailsForm() {
     }).format(parseFloat(numbers) / 100);
     return formatted;
   };
+
+  // Garante que o município só seja aplicado após o estado estar definido (lista carregada)
+  useEffect(() => {
+    const raw = sessionStorage.getItem("simulationData");
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      const pendingCity = String(data?.municipality || "");
+      if (selectedState && pendingCity) {
+        const exists = municipalities[selectedState]?.some((m: any) => m.city === pendingCity);
+        if (exists) setValue("municipality", pendingCity, { shouldValidate: true });
+      }
+    } catch {}
+  }, [selectedState, setValue]);
 
   const BRL_NUMBER_REGEX = /-?\d{1,3}(?:\.\d{3})*(?:,\d{2})?|^-?\d+(?:,\d{2})?/;
   const extractBRL = (s: string): string => {
@@ -253,7 +300,10 @@ export function ProjectDetailsForm() {
         <form onSubmit={ handleSubmit(onSubmit, (e) => console.log('submit errors', e))} className="space-y-6">
           <div>
             <Label htmlFor="activitySector">Setor de atividade</Label>
-            <Select onValueChange={(value) => setValue("activitySector", value, { shouldValidate: true, shouldDirty: true })}>
+            <Select
+              value={watch('activitySector') || undefined}
+              onValueChange={(value) => setValue("activitySector", value, { shouldValidate: true, shouldDirty: true })}
+            >
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Selecione o setor" />
               </SelectTrigger>
@@ -276,7 +326,10 @@ export function ProjectDetailsForm() {
 
           <div>
             <Label htmlFor="creditType">Modalidade do crédito</Label>
-            <Select onValueChange={(value) => setValue("creditType", value, { shouldValidate: true, shouldDirty: true })}>
+            <Select
+              value={watch('creditType') || undefined}
+              onValueChange={(value) => setValue("creditType", value, { shouldValidate: true, shouldDirty: true })}
+            >
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Selecione a modalidade" />
               </SelectTrigger>
@@ -320,6 +373,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="state">Estado</Label>
               <Select
+                value={watch('state') || undefined}
                 onValueChange={(value) => {
                   setValue("state", value, { shouldValidate: true, shouldDirty: true });
                   setSelectedState(value);
@@ -348,6 +402,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="municipality">Município</Label>
               <Select
+                value={watch('municipality') || undefined}
                 onValueChange={(value) => setValue("municipality", value, { shouldValidate: true, shouldDirty: true })}
                 disabled={!selectedState}
               >
@@ -459,6 +514,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="state">Índice de correção</Label>
               <Select
+                value={watch('indice') || undefined}
                 onValueChange={(value) => {
                   setValue("indice", value, { shouldValidate: true, shouldDirty: true });
                 }}
@@ -486,6 +542,7 @@ export function ProjectDetailsForm() {
             <div>
               <Label htmlFor="municipality">Sistema de Amortização</Label>
               <Select
+                value={watch('amortization') || undefined}
                 onValueChange={(value) => setValue("amortization", value, { shouldValidate: true, shouldDirty: true })}
               >
                 <SelectTrigger className="mt-2">
