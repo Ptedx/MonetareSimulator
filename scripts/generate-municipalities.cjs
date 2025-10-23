@@ -54,19 +54,12 @@ function main() {
     map[uf].push({city: city, rate: rate});
   }
 
-  // normalização: dedup + ordenação
-  // for (const uf of Object.keys(map)) {
-  //   // const unique = Array.from(new Set(map[uf]));
-  //   map[uf] = [...byName.values()].sort((a, b) =>
-  //     a.city.localeCompare(b.city, 'pt-BR')
-  //   );
-  // }
   for (const uf of Object.keys(map)) {
     const byName = new Map();
     for (const item of map[uf]) {
       const key = (item.city || '').trim().toLowerCase();
       if (!key) continue;
-      if (!byName.has(key)) byName.set(key, item); // mantém o primeiro, descarta duplicatas
+      if (!byName.has(key)) byName.set(key, item); 
       }
       map[uf] = [...byName.values()].sort((a, b) =>
       a.city.localeCompare(b.city, 'pt-BR')
