@@ -127,7 +127,9 @@ export function ProjectDetailsForm() {
   const isPriority = city?.rate === 0.9
 
   const watchedFinancedValue = watch("financedValue");
-  const basicData = JSON.parse(localStorage.getItem("basicData") || "{}");
+  const basicData = JSON.parse(sessionStorage.getItem("basicData") || "{}");
+
+  if (!basicData) navigate('/')
 
   const onSubmit = async (data: ProjectDetailsFormData) => {
     console.log('basicData: ', basicData)
@@ -157,8 +159,8 @@ export function ProjectDetailsForm() {
         return;
       }
 
-      localStorage.setItem("simulationResult", JSON.stringify(result));
-      localStorage.setItem("simulationData", JSON.stringify(fullData));
+      sessionStorage.setItem("simulationResult", JSON.stringify(result));
+      sessionStorage.setItem("simulationData", JSON.stringify(fullData));
       navigate("/resultado");
     } catch (error) {
       console.error("Error submitting form:", error);

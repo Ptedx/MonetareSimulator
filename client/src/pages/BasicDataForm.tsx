@@ -123,7 +123,6 @@ export function BasicDataForm() {
       phone: (data.phone || '').replace(/\D/g, ''),
       cnpj: (data.cnpj || '').replace(/\D/g, ''),
     };
-    localStorage.setItem("basicData", JSON.stringify(cleaned));
     sessionStorage.setItem('basicData', JSON.stringify(cleaned))
     navigate("/projeto");
   };

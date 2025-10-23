@@ -62,8 +62,8 @@ export function ResultsPage() {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
 
   useEffect(() => {
-    const savedResult = localStorage.getItem("simulationResult");
-    const savedData = localStorage.getItem("simulationData");
+    const savedResult = sessionStorage.getItem("simulationResult");
+    const savedData = sessionStorage.getItem("simulationData");
 
     if (savedResult && savedData) {
       setApiResult(JSON.parse(savedResult));
