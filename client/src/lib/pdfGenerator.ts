@@ -1,5 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import logoUrl from '@assets/monetare_logo.png'
+
 
 // Shape of API result from /api/real-simulate
 export interface ApiScheduleRow {
@@ -53,7 +55,7 @@ export interface SimulationData {
 
 const colors = {
   brand: [14, 101, 69] as [number, number, number], // dark green
-  brandLight: [227, 242, 236] as [number, number, number],
+  brandLight: [255, 255, 255] as [number, number, number],
   text: [22, 28, 45] as [number, number, number],
   muted: [108, 114, 128] as [number, number, number],
   border: [229, 231, 235] as [number, number, number],
@@ -64,8 +66,15 @@ const currency = (n: number) =>
 
 const formatPct = (n: number) => `${n.toFixed(2).replace(".", ",")}%`;
 
-export function generatePDF(api: ApiResult, data: SimulationData) {
+export async function generatePDF(api: ApiResult, data: SimulationData) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const res = await fetch(logoUrl);
+  const blob = await res.blob();
+  const logo = await new Promise<string>((resolve) => {
+  const r = new FileReader();
+  r.onloadend = () => resolve(r.result as string);
+  r.readAsDataURL(blob);
+  });
 
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...colors.text);
@@ -76,8 +85,11 @@ export function generatePDF(api: ApiResult, data: SimulationData) {
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...colors.brand);
-  doc.text("monetare", 14, 12);
   doc.setTextColor(...colors.text);
+  const { width: iw, height: ih } = doc.getImageProperties(logo);
+  const h = 8, w = (iw / ih) * h, x = 14, y2 = (18 - h) / 2;
+  doc.addImage(logo, "PNG", x, y2, w, h);
+  doc.setTextColor(...colors.text)
 
   // Title
   doc.setFontSize(18);
