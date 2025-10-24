@@ -265,9 +265,11 @@ export function ProjectDetailsForm() {
     const formatedRevenue = brlToNumber(revenue)
     const formatedFinanced = brlToNumber(financed);
     console.log('isPriority: ', isPriority)
+    console.log('financed: ', financed)
+    console.log('formatedFinance: ', formatedFinanced)
 
     if(!isPriority && formatedRevenue <= 4_800_000){
-      return formatCurrency((formatedFinanced).toString())
+      return financed
     }
     if(!isPriority && formatedRevenue > 4_800_000 && formatedRevenue <= 90_000_000){
       return formatCurrency((formatedFinanced * 0.8).toFixed(2).toString())
@@ -278,7 +280,7 @@ export function ProjectDetailsForm() {
       return formatCurrency((formatedFinanced * 0.6).toFixed(2).toString())
     }
     else{
-      return formatCurrency((formatedFinanced).toString())
+      return financed
     }
 
   }

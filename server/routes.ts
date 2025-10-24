@@ -120,10 +120,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const ModalityEnum={
         'INVESTIMENTO':382878,
-        'CAPITAL DE GIRO':382880,
-        'INFRA,ÁGUA, ESGOTO E LOGÍSTICA':382882,
-        'INFRA- OUTROS':382884,
-        'INOVAÇÃO':382886,
+        'CAPITAL_DE_GIRO':382880,
+        'INFRA_AGUA_ESGOTO_LOGISTICA':382882,
+        'INFRA_OUTROS':382884,
+        'INOVACAO':382886,
       }
 
       const ActivityEnum={
@@ -141,12 +141,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const idRequestModel = {
+        fields:{
         NAME: name,
         LAST_NAME:lastname,
         ASSIGNED_BY_ID:1,
         PHONE: [ { "VALUE": phone, "VALUE_TYPE": "WORK" } ],
         EMAIL: [ { "VALUE": email, "VALUE_TYPE": "WORK" } ]
-      }
+      }}
+
 
       const requestModel = {
         produto: 'FNO',
@@ -167,7 +169,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const {data: idResult} = await axios.post('https://portal.monetare.com.br/rest/1/hsj2c13wxcl1rb7x/crm.contact.add.json', idRequestModel, headerOptions)
 
+
+      console.log('Tipo: ', creditType)
+      console.log('Modalidade: ', ModalityEnum[creditType])
+    
       const registerLeadModel = {
+        fields: {
        "CATEGORY_ID":22, // pipeline da simulacao
        "TITLE": companyName, //nome da empresa
        "CONTACT_ID": idResult?.result, // id do contato
@@ -183,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
        "UF_CRM_1760982465335":clientcity,
        "UF_CRM_1760974905323":state, //estado do projeto
        "UF_CRM_1760975444118":municipality //municio do projeto
-    }
+    }}
     
 
     console.log('idResult: ', idResult)
@@ -191,9 +198,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     const {data: CRMResult} = await axios.post('https://portal.monetare.com.br/rest/34/xyq8gr4wpy4i7mwb/crm.deal.add.json', registerLeadModel, headerOptions)
     
+
     const {data: result} = await axios.post('https://monetare-corporate.web.app/simulate', requestModel, headerOptions)
     
-    console.log('Result: ', result)
+    // console.log('Result: ', result)
     console.log('CRMResult: ', CRMResult)
 
     return res.json(result)
