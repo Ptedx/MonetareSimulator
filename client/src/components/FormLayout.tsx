@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-
+import logoUrl from '@assets/monetare_logo.png'
 interface FormLayoutProps {
   children: ReactNode;
 }
@@ -23,25 +23,7 @@ export function FormLayout({ children }: FormLayoutProps) {
 
       <header className="p-6 border-b relative z-10">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
-                />
-              </svg>
-            </div>
-            <span className="font-semibold text-lg">monetare</span>
-          </div>
-          <span className="text-xs text-gray-500">Corporate</span>
+            <img src={logoUrl} alt="Monetare" className="h-10 w-auto"  />
         </div>
       </header>
 
