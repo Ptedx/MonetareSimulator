@@ -101,6 +101,7 @@ const brazilianStates = [
 
 import { municipalities } from "../../../shared/municipalities";
 import { Checkbox } from "@/components/ui/checkbox";
+import { simulateResult } from "@/functions/simulate";
 
 export function ProjectDetailsForm() {
   const [, navigate] = useLocation();
@@ -178,19 +179,11 @@ export function ProjectDetailsForm() {
     };
 
     try {
-      const response = await fetch("/api/real-simulate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fullData),
-      });
-
-      const result = await response.json();
       
-      if (!response.ok) {
-        alert(result.message || "Erro ao calcular simulação");
-        return;
-      }
-
+      const result = await simulateResult(fullData)
+      
+      console.log('O que veio da função: ', result)
+      
       sessionStorage.setItem("simulationResult", JSON.stringify(result));
       sessionStorage.setItem("simulationData", JSON.stringify(fullData));
       navigate("/resultado");
